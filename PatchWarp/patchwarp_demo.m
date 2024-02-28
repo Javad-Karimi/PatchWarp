@@ -7,13 +7,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Add PatchWarp directory to MATLAB path
-patchwarp_path = 'Z:\People\Ryoma\PatchWarp';
+patchwarp_path = 'c:\Users\Javad\Documents\MATLAB\PatchWarp';
 addpath(genpath(patchwarp_path))
 
 %% Specifiy source directory and saving directory
 % Image data needs to be tiff stack files.
-ops.source_path = 'Z:\People\Ryoma\MC_data\171008\RH825';    % Directory that contains original tiff stack files
-ops.save_path = 'Z:\People\Ryoma\MC_data\171008\RH825\corrected';    % Directory where motion corrected images will be saved
+ops.source_path = 'c:\Users\Javad\Documents\MATLAB\Quinn&Javad\RSC_rigid_corrections\animal_2\test\';    % Directory that contains original tiff stack files
+ops.save_path = 'c:\Users\Javad\Documents\MATLAB\Quinn&Javad\RSC_rigid_corrections\animal_2\test\';    % Directory where motion corrected images will be saved
 
 %% Set general parameters
 % n_ch:                     Number of saved PMT channels. Set this to 2 for if the session was 2-color imaging.
@@ -56,9 +56,9 @@ ops.worker_num = cluster_properties.NumWorkers;
 %                               when rigid_template_center_frac = 0.8.
 % rigid_template_fftdenoise:    If true, strong periodic patterns (e.g. ripple patterns of PMT noise) will be removed from the template images by Fourier transform. 
 %                               This function improves the registration accuracy when PMT noise is obvious on the images due to dim calcium signals (e.g. GRIN lens imaging).
-ops.rigid_norm_method = 'rank';
+ops.rigid_norm_method = 'local';
 ops.rigid_norm_radius = 32;
-ops.rigid_template_tiffstack_num = 5;   % Note that this number needs to be smaller than the total number of tif stack files in the directory. Increase this number if the signals are dim.
+ops.rigid_template_tiffstack_num = 1;   % Note that this number needs to be smaller than the total number of tif stack files in the directory. Increase this number if the signals are dim.
 ops.rigid_template_block_num = 5;   % This must be an odd number (1, 3, 5,...). This parameter will be ignored if [number of tif stack files] < 3.
 ops.rigid_template_threshold = 0.2;
 ops.rigid_template_center_frac = 0.8;                               
@@ -98,7 +98,7 @@ ops.transform = 'affine';
 ops.affine_norm_radius = 32;
 ops.warp_pyramid_levels = 1;
 ops.warp_pyramid_iterations = 50;
-ops.warp_template_tiffstack_num = 7;    % Do not exceed the number of tiff stack files in the source directory. 
+ops.warp_template_tiffstack_num = 3;    % Do not exceed the number of tiff stack files in the source directory. 
                                     % If there is only 1 tiff stack in the source directroy, the # of frames set by 'downsample_frame_num' will be treated 
                                     % as a single block ([downsample_frame_num]*[warp_template_tiffstack_num] frames will be used to make the template).   
 ops.warp_movave_tiffstack_num = 1;
@@ -120,6 +120,7 @@ ops.affinematrix_abssum_jump_threshold = 10;
 ops.network_temp_copy = 1;
 
 %% Run PatchWarp
+tic
 patchwarp(ops);
-
+toc
 
