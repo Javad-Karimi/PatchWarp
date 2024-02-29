@@ -57,28 +57,30 @@ function done = pyramid_registration(fn, target, save_path, align_ch, save_ch, n
         disp(['Warning: ' rigid_norm_method 'is not a valid normalization method!!'])
     end
     
-    L.newline('Done. Motion correcting.');
-    if length(save_ch) > 1
-        ir = BilinearPyramidImageRegistrator(target, rigid_template_center_frac, 3);
-        t = zeros(size(image_stack_save,3),2);
-        for j = 1:size(image_stack_align,3)
-            t(2*j-1,:) = ir.register(double(image_stack_align(:,:,j)));
-            t(2*j,:) = t(2*j-1,:);
-        end
-    else
-        ir = BilinearPyramidImageRegistrator(target, rigid_template_center_frac, 3);
-        t = zeros(size(image_stack_align,3),2);
-        for j = 1:size(image_stack_align,3)
-            t(j,:)=ir.register(double(image_stack_align(:,:,j)));
-        end
-    end
+    % L.newline('Done. Motion correcting.');
+    % if length(save_ch) > 1
+    %     ir = BilinearPyramidImageRegistrator(target, rigid_template_center_frac, 3);
+    %     t = zeros(size(image_stack_save,3),2);
+    %     for j = 1:size(image_stack_align,3)
+    %         t(2*j-1,:) = ir.register(double(image_stack_align(:,:,j)));
+    %         t(2*j,:) = t(2*j-1,:);
+    %     end
+    % else
+    %     ir = BilinearPyramidImageRegistrator(target, rigid_template_center_frac, 3);
+    %     t = zeros(size(image_stack_align,3),2);
+    %     for j = 1:size(image_stack_align,3)
+    %         t(j,:)=ir.register(double(image_stack_align(:,:,j)));
+    %     end
+    % end
     
-    L.newline('Done. Shifting signal ch.');
-    corrected = zeros(size(image_stack_save),'single');
-    for j = 1:size(image_stack_save,3)
-        corrected(:,:,j)=BilinearPyramidImageRegistrator.shift(...
-            image_stack_save(:,:,j),t(j,:));
-    end
+    corrected = image_stack_save;
+
+    % L.newline('Done. Shifting signal ch.');
+    % corrected = zeros(size(image_stack_save),'single');
+    % for j = 1:size(image_stack_save,3)
+    %     corrected(:,:,j)=BilinearPyramidImageRegistrator.shift(...
+    %         image_stack_save(:,:,j),t(j,:));
+    % end
 
     
 %     % Added by RH to change scanimage.SI4.channelsSave from original to save_ch
@@ -101,21 +103,24 @@ function done = pyramid_registration(fn, target, save_path, align_ch, save_ch, n
         downsampled = [];
     end
         
+    
+
     if(n_downsampled_perstack>0)
         L.newline('Done. Shifting align ch.');
-        if length(save_ch) > 1
-            corrected_align = zeros(size(image_stack_align),'single');
-            for j = 1:size(image_stack_align,3)
-                corrected_align(:,:,j)=BilinearPyramidImageRegistrator.shift(...
-                    image_stack_align(:,:,j),t(2*j-1,:));
-            end
-        else
-            corrected_align = zeros(size(image_stack_align),'single');
-            for j = 1:size(image_stack_align,3)
-                corrected_align(:,:,j)=BilinearPyramidImageRegistrator.shift(...
-                    image_stack_align(:,:,j),t(j,:));
-            end
-        end
+        % if length(save_ch) > 1
+            % corrected_align = zeros(size(image_stack_align),'single');
+            % for j = 1:size(image_stack_align,3)
+            %     corrected_align(:,:,j)=BilinearPyramidImageRegistrator.shift(...
+            %         image_stack_align(:,:,j),t(2*j-1,:));
+            % end
+        corrected_align = image_stack_align;
+        % else
+            % corrected_align = zeros(size(image_stack_align),'single');
+            % for j = 1:size(image_stack_align,3)
+            %     corrected_align(:,:,j)=BilinearPyramidImageRegistrator.shift(...
+            %         image_stack_align(:,:,j),t(j,:));
+            % end
+        % end
         downsampled_perstack = cast(downsample_mean(corrected_align, n_downsampled_perstack,3), class(image_stack_align));
     else
         downsampled_perstack = [];
@@ -137,7 +142,6 @@ function done = pyramid_registration(fn, target, save_path, align_ch, save_ch, n
     save(fn_summary_mat, '-v6',   'downsampled',...
                                   'downsampled_perstack',...
                                   'info',...
-                                  't',...
                                   'target',...
                                   'method', ...
                                   'align_ch',...

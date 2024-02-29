@@ -1,9 +1,11 @@
+tic
 obj_avi= VideoReader('c:\Users\Javad\Documents\MATLAB\Quinn&Javad\RSC_rigid_corrections\animal_2\msvideo1.avi');
 vid = read(obj_avi);
+toc
 %%
 vid_squeezed = squeeze(vid);
 %%
-block_size = 1000;
+block_size = 150;
 block_quant = ceil(size(vid_squeezed,3) / block_size);
 %%
 Matlab_FastTiffReadWrite_path = 'c:\Users\Javad\Documents\MATLAB\Matlab_FastTiffReadWrite';
