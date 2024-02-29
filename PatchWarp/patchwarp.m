@@ -131,8 +131,8 @@ if (ops.rigid_template_fftdenoise == true)
 end
 
 %% Start parallel pool
-delete(gcp('nocreate'));
-parpool(ops.worker_num);
+% delete(gcp('nocreate'));
+% parpool(ops.worker_num);
 
 %% Run rigid correction
 save_path_prewarp = fullfile(ops.save_path, 'pre_warp');
@@ -153,7 +153,7 @@ else
 end
 
 %% Shutdown parallel pool
-delete(gcp('nocreate'))
+% delete(gcp('nocreate'))
         
     
     

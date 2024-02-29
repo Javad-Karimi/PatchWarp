@@ -4,16 +4,24 @@
 % 
 % Released by Ryoma Hattori
 % Email: rhattori0204@gmail.com
+% modified y Javad Karimi Abadchi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%% converting avi stack to a collection of tiff stacks (block_size = # tiff stacks)
+source_path = 'c:\Users\Javad\Documents\MATLAB\Quinn&Javad\RSC_rigid_corrections\animal_1\';
+fileneame = 'msvideo.avi';
+Matlab_FastTiffReadWrite_path = 'c:\Users\Javad\Documents\MATLAB\Matlab_FastTiffReadWrite';
+block_size = 500;
+tic
+AVI2TIFF(source_path,fileneame, block_size, Matlab_FastTiffReadWrite_path);
+toc
 %% Add PatchWarp directory to MATLAB path
 patchwarp_path = 'c:\Users\Javad\Documents\MATLAB\PatchWarp';
 addpath(genpath(patchwarp_path))
 
 %% Specifiy source directory and saving directory
 % Image data needs to be tiff stack files.
-ops.source_path = 'c:\Users\Javad\Documents\MATLAB\Quinn&Javad\RSC_rigid_corrections\animal_2\test\';    % Directory that contains original tiff stack files
-ops.save_path = 'c:\Users\Javad\Documents\MATLAB\Quinn&Javad\RSC_rigid_corrections\animal_2\test\';    % Directory where motion corrected images will be saved
+ops.source_path = source_path;    % Directory that contains original tiff stack files
+ops.save_path = source_path;    % Directory where motion corrected images will be saved
 
 %% Set general parameters
 % n_ch:                     Number of saved PMT channels. Set this to 2 for if the session was 2-color imaging.
@@ -31,13 +39,14 @@ ops.run_affine_wc = 1;
 % Downsampled movie will be created after rigid motion correction and affine correction.
 % These tiff stack files can be used for visual inspection of the motion correction quality.
 % downsample_frame_num:     Window size for non-overlapping moving averaging.
-ops.downsample_frame_num = 50; 
+ops.downsample_frame_num = 5; 
 
 %% Specify the number of workers for parallel processing
 % worker_num:   Specify the number of workers that processing registrations in parallel. Assign all available CPU cores for the maximum processing
 %               speed (e.g. parcluster('local').NumWorkers). If you get 'Out of Memory' error due to limited RAM, assign smaller number of workers.
-cluster_properties = parcluster('local');
-ops.worker_num = cluster_properties.NumWorkers; 
+
+% cluster_properties = parcluster('local');
+% ops.worker_num = cluster_properties.NumWorkers; 
 
 %% Set parameter for rigid motion correction
 % rigid_norm_method:            'rank' or 'local'. Default is 'rank'. Try 'local' when 'rank' does not work well. The normalization is always 'local' 
@@ -56,12 +65,12 @@ ops.worker_num = cluster_properties.NumWorkers;
 %                               when rigid_template_center_frac = 0.8.
 % rigid_template_fftdenoise:    If true, strong periodic patterns (e.g. ripple patterns of PMT noise) will be removed from the template images by Fourier transform. 
 %                               This function improves the registration accuracy when PMT noise is obvious on the images due to dim calcium signals (e.g. GRIN lens imaging).
-ops.rigid_norm_method = 'local';
+ops.rigid_norm_method = 'rank';
 ops.rigid_norm_radius = 32;
 ops.rigid_template_tiffstack_num = 1;   % Note that this number needs to be smaller than the total number of tif stack files in the directory. Increase this number if the signals are dim.
 ops.rigid_template_block_num = 5;   % This must be an odd number (1, 3, 5,...). This parameter will be ignored if [number of tif stack files] < 3.
-ops.rigid_template_threshold = 0.2;
-ops.rigid_template_center_frac = 0.8;                               
+ops.rigid_template_threshold = 0.7;
+ops.rigid_template_center_frac = 0.4;                               
 ops.rigid_template_fftdenoise = false;
 
 %% Set parameter for warp correction
@@ -98,7 +107,7 @@ ops.transform = 'affine';
 ops.affine_norm_radius = 32;
 ops.warp_pyramid_levels = 1;
 ops.warp_pyramid_iterations = 50;
-ops.warp_template_tiffstack_num = 3;    % Do not exceed the number of tiff stack files in the source directory. 
+ops.warp_template_tiffstack_num = 1;    % Do not exceed the number of tiff stack files in the source directory. 
                                     % If there is only 1 tiff stack in the source directroy, the # of frames set by 'downsample_frame_num' will be treated 
                                     % as a single block ([downsample_frame_num]*[warp_template_tiffstack_num] frames will be used to make the template).   
 ops.warp_movave_tiffstack_num = 1;
